@@ -27,8 +27,9 @@ def run_server(port):
                 inputs.append(new_socket)
                 message_queue[new_socket] = queue.Queue()
             else:
+                
                 data = server.recv(4096)
-                if data != None:
+                if len(data) != 0:
                      print(server.getpeername(), len(data), 'bytes' , data)
                      message_queue[server].put(data)
 
@@ -38,27 +39,32 @@ def run_server(port):
                     if server in outputs:
                         outputs.remove(server)
                     inputs.remove(server)
-                    s.close()
-                    print(new_socket.getpeername(), ':  disconnected')
+                    print(server.getpeername(), ':  disconnected')
+                    server.close()
+                    
                     del message_queue[server]
 
-                for server in w:
-                    try:
-                        next_byte_string = message_queue[server].get_nowait()
-                    except queue.Empty:
-                        print('output queue for', server.getpeername(), 'is empty')
-                        outputs.remove(server)
-                    else:
-                        print(server.getpeername(), len(next_byte_string), 'bytes' , next_byte_string)
-                        server.send(next_byte_string)
+                # for server in w:
+                #     try:
+                #         next_byte_string = message_queue[server].get_nowait()
+                #     except queue.Empty:
+
+                #         print('output queue for', server.getpeername(), 'is empty')
+                        
+                #         outputs.remove(server)
+                #         server.close()
+                #         print(new_socket.getpeername(), ':  disconnected')
+                #     else:
+                #         print(server.getpeername(), len(next_byte_string), 'bytes' , next_byte_string)
+                #         server.send(next_byte_string)
                 
-                for server in e:
-                    print('handling exceptional condition for', server.getpeername())
-                    inputs.remove(server)
-                    if server in outputs:
-                        outputs.remove(server)
-                    server.close()
-                    del message_queue[server]
+                # for server in e:
+                #     print('handling exceptional condition for', server.getpeername())
+                #     inputs.remove(server)
+                #     if server in outputs:
+                #         outputs.remove(server)
+                #     server.close()
+                #     del message_queue[server]
 
 
 
